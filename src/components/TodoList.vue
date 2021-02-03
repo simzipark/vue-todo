@@ -2,13 +2,13 @@
   <ul>
     <li
       class="shadow "
-      v-for="(todoItem, index) in todoItems"
+      v-for="(todoItem, index) in propsdata"
       v-bind:key="todoItem.item"
     >
       <i
         class="checkBtn fas fa-check"
         v-bind:class="{ checkBtnCompleted: todoItem.completed }"
-        v-on:click="toggleComplete(todoItem)"
+        v-on:click="toggleComplete(todoItem, index)"
       ></i>
       <span v-bind:class="{ textCompleted: todoItem.completed }">{{
         todoItem.item
@@ -22,32 +22,18 @@
 
 <script>
 export default {
+  props: ["propsdata"],
   data: function() {
     return {
       todoItems: [],
     };
   },
-  // 뷰 인스턴스 라이프사이클 중 인스턴스가 생성 되자마자 호출되는 훅
-  created: function() {
-    if (localStorage.length > 0) {
-      for (var i = 0; i < localStorage.length; i++) {
-        if (localStorage.key(i) !== "loglevel:webpack-dev-server") {
-          this.todoItems.push(
-            JSON.parse(localStorage.getItem(localStorage.key(i)))
-          );
-        }
-      }
-    }
-  },
   methods: {
     removeTodo: function(todoItem, index) {
-      localStorage.removeItem(todoItem);
-      this.todoItems.splice(index, 1);
+      this.$emit("removeItem", todoItem, index);
     },
-    toggleComplete: function(todoItem) {
-      todoItem.completed = !todoItem.completed;
-      localStorage.removeItem(todoItem.item);
-      localStorage.setItem(todoItem.item, JSON.stringify(todoItem));
+    toggleComplete: function(todoItem, index) {
+      this.$emit("toggleItem", todoItem, index);
     },
   },
 };
