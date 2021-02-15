@@ -1,40 +1,66 @@
 <template>
-  <ul>
-    <li
+  <transition-group name="list" tag="ul">
+    <!-- <li
       class="shadow "
       v-for="(todoItem, index) in propsdata"
+      v-bind:key="todoItem.item"
+    > -->
+    <li
+      class="shadow "
+      v-for="(todoItem, index) in this.storedTodoItems"
       v-bind:key="todoItem.item"
     >
       <i
         class="checkBtn fas fa-check"
         v-bind:class="{ checkBtnCompleted: todoItem.completed }"
-        v-on:click="toggleComplete(todoItem, index)"
+        v-on:click="toggleComplete({ todoItem, index })"
       ></i>
       <span v-bind:class="{ textCompleted: todoItem.completed }">{{
         todoItem.item
       }}</span>
-      <span class="removeBtn" v-on:click="removeTodo(todoItem, index)"
+      <!-- mapMutation으로 refactoring하면서 인자값을 1개 넘기므로 아래처럼 수정 -->
+      <!-- removeTodo(todoItem, index) => removeTodo({ todoItem, index }) -->
+      <span class="removeBtn" v-on:click="removeTodo({ todoItem, index })"
         ><i class="fas fa-trash-alt"></i
       ></span>
     </li>
-  </ul>
+  </transition-group>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex";
 export default {
-  props: ["propsdata"],
-  data: function() {
-    return {
-      todoItems: [],
-    };
-  },
+  // props: ["propsdata"],
+  // data() {
+  //   return {
+  //     todoItems: [],
+  //   };
+  // },
   methods: {
-    removeTodo: function(todoItem, index) {
-      this.$emit("removeItem", todoItem, index);
-    },
-    toggleComplete: function(todoItem, index) {
-      this.$emit("toggleItem", todoItem, index);
-    },
+    ...mapMutations({
+      removeTodo: "removeOneItem",
+      toggleComplete: "toggleOneItem",
+    }),
+    // removeTodo(todoItem, index) {
+    //   // this.$emit("removeItem", todoItem, index);
+    //   this.$store.commit("removeOneItem", {
+    //     todoItem,
+    //     index,
+    //   });
+    // },
+    // toggleComplete(todoItem, index) {
+    //   // this.$emit("toggleItem", todoItem, index);
+    //   this.$store.commit("toggleOneItem", {
+    //     todoItem,
+    //     index,
+    //   });
+    // },
+  },
+  computed: {
+    // todoItems() {
+    //   return this.$store.getters.storedTodoItems;
+    // },
+    ...mapGetters(["storedTodoItems"]),
   },
 };
 </script>
